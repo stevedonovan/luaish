@@ -1,6 +1,6 @@
 ## A better REPL for Lua
 
-luaish is based on [lua.lua](http://lua-users.org/wiki/LuaInterpreterInLua) which is a Lua interpreter front-end written in Lua. 
+luaish is based on [lua.lua](http://lua-users.org/wiki/LuaInterpreterInLua) which is a Lua interpreter front-end written in Lua by David Manura.
 
     /mnt/extra/luaish$ lua52 lua.lua -h
     usage: lua.lua [options] [script [args]].
@@ -25,6 +25,8 @@ This also works with objects (such as strings). After 's:r' <tab> will complete 
 There is also a few shortcuts defined, so 'fn' <tab> gives 'function', and 'rt' <tab> gives 'return'.
 
 luaish makes the command history available in the usual way, and saves it in the `~/luai-history` file.   Anything you put in the `~/luairc.lua` file will be loaded at startup.
+
+luaish uses [luaposix](https://github.com/rrthomas/luaposix) for directory iteration and setting the process environment.
 
 There is an _optional_ dependency on [Microlight](https://github.com/stevedonovan/Microlight), which is only used to provide some table-dumping abilities to the REPL:
 
@@ -112,7 +114,7 @@ which is defined so:
     
 Nothing fancy goes on here; any arguments to the alias are passed to the command directly.
 
-Now the implementation of 'export' can be explained. There is a built-in function which uses [luaposix]()'s `setenv` function:
+Now the implementation of 'export' can be explained. There is a built-in function which uses [luaposix](https://github.com/rrthomas/luaposix)'s `setenv` function:
 
     function luaish.lsetenv (f)
         local line = f:read()
