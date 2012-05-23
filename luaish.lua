@@ -275,16 +275,7 @@ local function exec (line)
 	end		
 	return true
     else
-        if line:match '&%s*$' then -- no result, don't try to grab!
-            os.execute(line)
-        else
-            local f = io.popen(line.. ' 2>&1','r') -- merge stderr with stdout
-            local res = f:read '*a'
-            _G['__'] = res:gsub('\n$','')
-            file_list[1] = _G['__'] -- support $1 in subsequent commands
-            io.write(res)
-            f:close()
-        end
+        os.execute(line)
     end
     return true
 end
