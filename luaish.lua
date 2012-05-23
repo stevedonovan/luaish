@@ -275,7 +275,16 @@ local function exec (line)
 	end		
 	return true
     else
-	os.execute(line)
+        if line:match '&%s*$' then -- no result, don't try to grab!
+            os.execute(line)
+        else
+            local f = io.popen(line.. ' 2>&1','r') -- merge stderr with stdout
+            local res = f:read '*a'
+            _G['__'] = res:gsub('\n$','')
+            file_list[1] = _G['__'] -- support $1 in subsequent commands
+            io.write(res)
+            f:close()
+        end
     end
     return true
 end
@@ -319,6 +328,7 @@ function shell_command_handler (line)
             if k then
                 arg = arg:gsub('%-','../',k)
             end
+            arg = arg:gsub('^~',os.getenv 'HOME')
 	    if not is_directory(arg) then
 		arg = posix.dirname(arg)
 	    end
@@ -360,7 +370,10 @@ lsh.add_completion('^%.',path_candidates)
 -- output; tables will be printed out
 if have_ml then
 	lsh.set_tostring(ml.tstring)
+        _G.ml = ml
 end
+local ok
+ok,_G.config = pcall(require,'config')
 
 lsh.set_shortcuts {
 	fn = "function ",
@@ -379,7 +392,7 @@ if f then
 	f:close()		
 	dofile(luarc)
 else
-	print 'no ~/.luairc.lua found'
+	--print 'no ~/.luairc.lua found'
 end
 
 return lsh
